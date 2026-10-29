@@ -1,8 +1,22 @@
 import asyncio, json, os, subprocess, textwrap
 import requests, edge_tts
 
-MODEL = os.environ.get("GEMINI_MODEL", "gemini-2.5-flash")
 KEY = os.environ["GEMINI_API_KEY"]
+
+
+def pick_model():
+    r = requests.get(
+        f"https://generativelanguage.googleapis.com/v1beta/models?key={KEY}", timeout=30)
+    r.raise_for_status()
+    bad = ("lite", "image", "tts", "live", "audio", "exp", "preview")
+    names = [m["name"].split("/")[-1] for m in r.json()["models"]
+             if "generateContent" in m.get("supportedGenerationMethods", [])
+             and "flash" in m["name"] and not any(b in m["name"] for b in bad)]
+    return "gemini-flash-latest" if "gemini-flash-latest" in names else sorted(names)[-1]
+
+
+MODEL = pick_model()
+print("Using model:", MODEL)
 VOICE = "en-US-GuyNeural"
 FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
 USED = "used_topics.json"

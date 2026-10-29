@@ -33,11 +33,19 @@ def get_script():
         '"lines": [5-7 short sentences, max 12 words each, first one a hook]}'
     )
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={KEY}"
-    r = requests.post(url, json={
+        body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"responseMimeType": "application/json"},
-    }, timeout=60)
-    r.raise_for_status()
+    }
+    for attempt in range(3):
+        try:
+            r = requests.post(url, json=body, timeout=180)
+            r.raise_for_status()
+            break
+        except requests.exceptions.RequestException as e:
+            print("Gemini attempt", attempt + 1, "failed:", e)
+            if attempt == 2:
+                raise
     data = json.loads(r.json()["candidates"][0]["content"]["parts"][0]["text"])
     used.append(data["topic"])
     json.dump(used, open(USED, "w"), indent=1)

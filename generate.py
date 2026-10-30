@@ -2,6 +2,10 @@ import asyncio, json, os, subprocess, textwrap
 import requests, edge_tts
 
 KEY = os.environ["GEMINI_API_KEY"]
+VOICE = "en-US-GuyNeural"
+FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
+USED = "used_topics.json"
+OUT = "out"
 
 
 def pick_model():
@@ -17,10 +21,6 @@ def pick_model():
 
 MODEL = pick_model()
 print("Using model:", MODEL)
-VOICE = "en-US-GuyNeural"
-FONT = "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf"
-USED = "used_topics.json"
-OUT = "out"
 
 
 def get_script():
@@ -33,7 +33,7 @@ def get_script():
         '"lines": [5-7 short sentences, max 12 words each, first one a hook]}'
     )
     url = f"https://generativelanguage.googleapis.com/v1beta/models/{MODEL}:generateContent?key={KEY}"
-        body = {
+    body = {
         "contents": [{"parts": [{"text": prompt}]}],
         "generationConfig": {"responseMimeType": "application/json"},
     }

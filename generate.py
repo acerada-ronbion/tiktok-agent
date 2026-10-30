@@ -61,7 +61,7 @@ def duration(path):
 
 async def make_clip(i, line):
     mp3, txt, clip = f"{OUT}/{i}.mp3", f"{OUT}/{i}.txt", f"{OUT}/{i}.mp4"
-    await edge_tts.Communicate(line, VOICE).save(mp3)
+    await asyncio.wait_for(edge_tts.Communicate(line, VOICE).save(mp3), timeout=60)
     open(txt, "w").write(textwrap.fill(line, 20))
     d = duration(mp3) + 0.3
     vf = (f"drawtext=fontfile={FONT}:textfile={txt}:fontcolor=white:fontsize=72:"
